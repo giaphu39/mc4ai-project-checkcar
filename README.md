@@ -3,12 +3,12 @@
 Họ Tên|Lớp|Email
 -|-|-
 Ngô Nguyễn Đông Quân|11CS|nndquan296@gmail.com
-Vũ Nam Khánh|11A|
+Vũ Nam Khánh|11A|khanhvn22102006@gmail.com
 Trần Gia Phú|11A|trangiaphu39@gmail.com
 
 # Thông tin project
 ## Đề tài: Hệ thống phát hiện xe hơi đậu trước nhà
-## Các thư viện sử dụng: `OpenCV, torch, torchvision, Pillow, tqdm, pygame`
+## Các thư viện sử dụng: `OpenCV, torch, torchvision, Pillow, tqdm, pygame,numpy`
 
 ## Các chức năng chính & kế hoạch thực hiện
 
