@@ -1,0 +1,7 @@
+openCV
+torch
+torchvision
+pillow
+tqdm
+pygame
+numpy
