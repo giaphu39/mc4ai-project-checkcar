@@ -5,8 +5,8 @@ import pickle
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
-
-# Load pre-trained model
+import cv2
+from sklearn.linear_model import LogisticRegression
 class PretrainModel:
     def __init__(self):
         self.model = torch.load("models/pretrained.pkl")
@@ -26,15 +26,9 @@ class PretrainModel:
         with torch.no_grad():
             feature = self.model(image_tensor).squeeze().detach().cpu().numpy()
         return feature
-
-# hàm đọc file chứa nhãn của các hình ảnh
-# trả ra 1 dictionary với key là tên file, value là nhãn (1: có xe, 0: ko có xe) (nhãn y dùng để train)
 def read_training_data_label():
     with open("data/image_label.pkl", "rb") as f:
         return pickle.load(f)
-
-# hàm đọc các file ảnh trong thư mục data/images
-# trả ra 1 dictionary với key là tên file, value là vector đặc trưng của file ảnh đó (vector x dùng để train)
 def read_training_data():
     features_dict = {}
     folder_path = 'data/images'
@@ -44,3 +38,44 @@ def read_training_data():
         pil_image = Image.open(img_path).convert("RGB")
         features_dict[filename] = pretrained.get_feature(pil_image)
     return features_dict
+
+def train_model(X, y):
+    model = LogisticRegression()
+    model.fit(X, y)
+    return model
+
+def save_model(model):
+    with open("model.pkl", "wb") as f:
+        pickle.dump(model, f)
+
+def load_model():
+    with open("model.pkl", "rb") as f:
+        model = pickle.load(f)
+    return model
+
+pretrained_model = PretrainModel()
+label_dict = read_training_data_label()
+data_dict = read_training_data()
+X = []
+y = []
+for filename, features in data_dict.items():
+    label = label_dict.get(filename)
+    if label is not None:
+        X.append(features)
+        y.append(label)
+
+model = train_model(X, y)
+save_model(model)
+loaded_model = load_model()
+cap = cv2.VideoCapture(0)
+while True:
+    ret, frame = cap.read()
+    cv2.imshow('frame', frame)
+    if ret:
+        input_image = frame
+        input_image = Image.fromarray(input_image)
+        feature_vector = pretrained_model.get_feature(input_image)
+        prediction = loaded_model.predict([feature_vector])
+        if prediction == 1:
+            print('warning')
+            
