@@ -70,7 +70,8 @@ loaded_model = load_model()
 cap = cv2.VideoCapture(0)
 while True:
     ret, frame = cap.read()
-    cv2.imshow('frame', frame)
+    if not ret:
+        break
     if ret:
         input_image = frame
         input_image = Image.fromarray(input_image)
@@ -78,4 +79,6 @@ while True:
         prediction = loaded_model.predict([feature_vector])
         if prediction == 1:
             print('warning')
-            
+    cv2.imshow('frame', frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
