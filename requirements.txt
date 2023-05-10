@@ -7,4 +7,3 @@ pandas==2.0.0
 scikit-learn==1.2.2
 pygame==2.3.0
 tqdm
-time
