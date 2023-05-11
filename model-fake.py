@@ -6,7 +6,9 @@ import numpy as np
 from PIL import Image
 from tqdm import tqdm
 import cv2
+import pygame
 from sklearn.linear_model import LogisticRegression
+import pygame.mixer as mixer
 class PretrainModel:
     def __init__(self):
         self.model = torch.load("models/pretrained.pkl")
@@ -48,45 +50,53 @@ def save_model(model):
     with open("model.pkl", "wb") as f:
         pickle.dump(model, f)
 
-# Load the logistic regression model
-with open("model.pkl", "rb") as f:
-  clf = pickle.load(f)
-# Load the pre-trained model
-pretrain_model = PretrainModel()
-# Open a camera or video feed
-cap = cv2.VideoCapture(0)
+def load_model():
+    with open("model.pkl", "rb") as f:
+        model = pickle.load(f)
+    return model
+
+pretrained_model = PretrainModel()
+label_dict = read_training_data_label()
+data_dict = read_training_data()
+X = []
+y = []
+for filename, features in data_dict.items():
+    label = label_dict.get(filename)
+    if label is not None:
+        X.append(features)
+        y.append(label)
+
+model = train_model(X, y)
+save_model(model)
+loaded_model = load_model()
+mixer.init()
+mixer.music.load(r"warning.mp3")
+mixer.music.set_volume(0.7)
+webcam=cv2.VideoCapture(0)
 while True:
-  # Capture frame-by-frame
-  ret, frame = cap.read()
-  # Convert the image to grayscale
-  gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-  # Detect cars in the frame using a car detector (e.g. Haar cascade)
-  detected_cars = []
-  # ...
-  # For each detected car, extract the feature vectors using the pre-trained model
-  # and use the logistic regression model to predict the presence of a car
-  cars_present = []
-  for car in detected_cars:
-    # Preprocess the image
-    x1, y1, w, h = car
-    x2, y2 = x1 + w, y1 + h
-    car_image = gray[y1:y2, x1:x2]
-    # Extract the image features using the pre-trained model
-    features = pretrain_model.extract_features(car_image)
-    # Make a prediction using the logistic regression model
-    prediction = clf.predict([features])
-    if prediction[0] == 1:
-      # Car is present
-      cars_present.append(car)
-  # Draw bounding boxes around the detected cars
-  for car in cars_present:
-    x1, y1, w, h = car
-    x2, y2 = x1 + w, y1 + h
-    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-  # Display the resulting frame
-  cv2.imshow('frame', frame)
-  if cv2.waitKey(1) & 0xFF == ord('q'):
+ ret,frame=webcam.read()
+ if ret==True:
+  input_image = Image.fromarray(frame)
+  feature_vector = pretrained_model.get_feature(input_image)
+  prediction = loaded_model.predict([feature_vector])
+  height, width = frame.shape[:2]
+  color = (0, 255, 0) 
+  x1 = width // 2 - 200
+  y1 = height // 2 - 200
+  x2 = width // 2 + 200
+  y2 = height // 2 + 200
+  if prediction == 1:
+   color = (0, 0, 255) 
+   if not mixer.music.get_busy():
+    mixer.music.play(fade_ms=3000)
+    print("detected car")
+  else:
+   color = (0, 255, 0)
+  frame = cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+ cv2.imshow("cars",frame)
+ key=cv2.waitKey(60) & 0xFF
+ if prediction == 1 and (not mixer.music.get_busy()):
+    mixer.music.play(fade_ms=3000)
+    print("detected car")
+ if key==ord("q"):
     break
-# Release the capture
-cap.release()
-cv2.destroyAllWindows()
