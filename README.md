@@ -15,9 +15,14 @@ Trần Gia Phú|11A|trangiaphu39@gmail.com
 Chức năng|Người thực hiện|Ngày hoàn thành dự kiến
 -|-|-
 Repository|Trần Gia Phú|13/5/23
-Hàm Main|Trần Gia Phú|13/5/23
-PretrainModel|Vũ Nam Khánh|13/5/23
-Read_training_data_label|Vũ Nam Khánh|13/5/23
-Read_training_data|Trần Gia Phú|13/5/23
+PretrainModel|COTAI Support|13/5/23
+Read_training_data_label|COTAI Support|13/5/23
+Read_training_data|COTAI Support|13/5/23
 Train model|Ngô Nguyễn Đông Quân|13/5/23
 Use model|Ngô Nguyễn Đông Quân|13/5/23
+Warning audio|Vũ Nam Khánh|13/5/23
+Frame|Trần Gia Phú|13/5/23
+
+## DEMO: link youtube: https://youtu.be/MCR1tV8ms7Q    
+## link DEMO dự phòng (drive): https://drive.google.com/file/d/1GcteyIp3qBgrmeiIHtsV6vb73h2-zoWD/view?usp=sharing 
+
